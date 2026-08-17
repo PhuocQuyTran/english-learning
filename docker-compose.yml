@@ -1,0 +1,9 @@
+services:
+  plan-portal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: plan-portal
+    ports:
+      - "8080:80"
+    restart: always

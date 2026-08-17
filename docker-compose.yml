@@ -1,0 +1,57 @@
+# services:
+#   plan-portal:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     container_name: plan-portal
+#     ports:
+#       - "8080:80"
+#     restart: unless-stopped
+# services:
+#   plan-portal:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#       target: builder
+#     command: npm run dev -- --host
+#     ports:
+#       - "5173:5173"
+#     volumes:
+#       - /app/node_modules
+#     develop:
+#       watch:
+#         - action: sync
+#           path: ./src
+#           target: /app/src
+#           ignore:
+#             - node_modules/
+
+#         - action: rebuild
+#           path: package.json
+
+#         - action: rebuild
+#           path: package-lock.json
+services:
+  plan-portal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      - /app/node_modules
+
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+
+        - action: rebuild
+          path: package.json
+
+        - action: rebuild
+          path: package-lock.json

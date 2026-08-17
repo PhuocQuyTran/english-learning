@@ -30,3 +30,7 @@ CodeGraph.md
 .env.local
 .env.example
 .env.test
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store

@@ -22,7 +22,7 @@ export default function ProtectedRoute() {
 
   return (
     <Layout>
-      <Outlet />;
+      <Outlet />
     </Layout>
   );
 }

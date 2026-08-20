@@ -14,9 +14,6 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { useState } from "react";
-import { useDictionary } from "@/hooks/useVocabulary";
-import { AudioPlayer } from "@/components/vocabulary/AudioPlayer";
 import { Link } from "react-router-dom";
 import {
   Menubar,

@@ -166,21 +166,20 @@ export default function LoginPage() {
                   )}
                 />
 
-                {/* Submit */}
                 <Button
                   id="login-submit"
                   type="submit"
-                  className="w-full text-tertiary"
+                  className="w-full"
                   disabled={loginMutation.isPending}
                 >
                   {loginMutation.isPending ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin text-tertiary" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Signing in…
                     </>
                   ) : (
                     <>
-                      <LogIn className="mr-2 h-4 w-4 text-tertiary" />
+                      <LogIn className="mr-2 h-4 w-4" />
                       Sign in
                     </>
                   )}

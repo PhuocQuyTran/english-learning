@@ -7,6 +7,7 @@ import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import ProtectedRoute from "@/routes/PrivateRoute";
 import VocabularyPage from "@/pages/VocabularyPage";
+const VocabularyDetailPage = lazy(() => import("@/pages/VocabularyDetailPage"));
 
 const LoginPage = lazy(() => import("@/pages/LoginPage"));
 const RegisterPage = lazy(() => import("@/pages/RegisterPage"));
@@ -60,6 +61,14 @@ const router = createBrowserRouter([
           <div className="p-8 text-muted-foreground">
             <VocabularyPage />
           </div>
+        ),
+      },
+      {
+        path: "vocabulary/:id",
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <VocabularyDetailPage />
+          </Suspense>
         ),
       },
       {

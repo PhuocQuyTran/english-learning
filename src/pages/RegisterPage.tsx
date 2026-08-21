@@ -251,8 +251,10 @@ export default function RegisterPage() {
                             disabled={registerMutation.isPending}
                             {...field}
                           />
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="sm"
                             tabIndex={-1}
                             aria-label={
                               showPassword ? "Hide password" : "Show password"
@@ -265,7 +267,7 @@ export default function RegisterPage() {
                             ) : (
                               <Eye className="h-4 w-4" />
                             )}
-                          </button>
+                          </Button>
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -289,8 +291,10 @@ export default function RegisterPage() {
                             disabled={registerMutation.isPending}
                             {...field}
                           />
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="sm"
                             tabIndex={-1}
                             aria-label={
                               showConfirm ? "Hide password" : "Show password"
@@ -303,7 +307,7 @@ export default function RegisterPage() {
                             ) : (
                               <Eye className="h-4 w-4" />
                             )}
-                          </button>
+                          </Button>
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -314,7 +318,7 @@ export default function RegisterPage() {
                 <Button
                   id="register-submit"
                   type="submit"
-                  className="w-full text-tertiary!"
+                  className="w-full"
                   disabled={registerMutation.isPending}
                 >
                   {registerMutation.isPending ? (

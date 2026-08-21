@@ -2,6 +2,7 @@ import {
   Menu,
   Search,
   BookOpen,
+  ChartNoAxesColumn,
   Headphones,
   FileText,
   LayoutDashboard,
@@ -16,6 +17,11 @@ const navItems = [
     label: "Vocabulary",
     href: "/vocabulary",
     icon: BookOpen,
+  },
+  {
+    label: "Flashcards",
+    href: "/flashcards",
+    icon: ChartNoAxesColumn,
   },
   {
     label: "Listening",
@@ -59,7 +65,7 @@ export default function HeaderMobile() {
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="flex h-7 w-20 items-center justify-center rounded-md hover:bg-muted bg-yellow-50 text-yellow-700"
+                className="flex h-7 md:w-20 sm:w-10 w-6 items-center justify-center rounded-md hover:bg-muted bg-yellow-50 text-yellow-700"
                 aria-label="Search dictionary"
               >
                 <Languages className="h-4 w-4" />

@@ -12,6 +12,8 @@ const VocabularyDetailPage = lazy(() => import("@/pages/VocabularyDetailPage"));
 const LoginPage = lazy(() => import("@/pages/LoginPage"));
 const RegisterPage = lazy(() => import("@/pages/RegisterPage"));
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
+const ReviewPage = lazy(() => import("@/pages/ReviewPage"));
+const ReviewHistoryPage = lazy(() => import("@/pages/ReviewHistoryPage"));
 
 function PageLoader() {
   return (
@@ -74,9 +76,17 @@ const router = createBrowserRouter([
       {
         path: "flashcards",
         element: (
-          <div className="p-8 text-muted-foreground">
-            Flashcards — coming soon
-          </div>
+          <Suspense fallback={<PageLoader />}>
+            <ReviewPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "flashcards/history",
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ReviewHistoryPage />
+          </Suspense>
         ),
       },
       {

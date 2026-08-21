@@ -153,17 +153,17 @@ export default function Aside() {
       ></div>
       <aside
         className={cn(
-          "flex flex-col bg-[#172554] py-5 px-2 h-screen top-0 md:h-[calc(100vh-72px)] z-20 fixed md:relative transition-all",
+          "flex flex-col bg-neutral py-5 px-2 h-screen top-0 md:h-[calc(100vh-72px)] z-20 fixed md:relative transition-all",
           isMenuOpen ? "left-0" : "-left-75 md:left-0",
           isCollapsed ? "md:w-20" : "w-75 md:w-64",
         )}
       >
-        <nav className="flex w-full flex-1 flex-col gap-1">
+        <nav className="flex w-full flex-1 flex-col gap-1 text-tertiary">
           <Button
             variant="ghost"
             onClick={() => setIsCollapsed(!isCollapsed)}
             className={cn(
-              "hidden h-10 w-full items-center gap-2 rounded-[6px] px-3 text-base text-[#D1D5DB] hover:bg-white/30 hover:shadow transition-colors md:flex",
+              "hidden h-10 w-full items-center gap-2 rounded-[6px] px-3 text-base text-tertiary! hover:bg-white/30 hover:shadow transition-colors md:flex",
               showLabels ? "justify-end" : "justify-center",
             )}
             title={isCollapsed ? "Expand menu" : "Collapse menu"}

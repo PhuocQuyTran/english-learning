@@ -21,3 +21,23 @@ export const FILTERS = [
   { value: "review", label: "Review" },
   { value: "mastered", label: "Mastered" },
 ] as const;
+
+export const SHORTCUTS = [
+  { key: "Space", label: "Flip card" },
+  { key: "1", label: "Again" },
+  { key: "2", label: "Hard" },
+  { key: "3", label: "Good" },
+  { key: "4", label: "Easy" },
+  { key: "Esc", label: "Close this dialog" },
+] as const;
+
+export const DUE_REVIEWS_QUERY_KEY = "due-reviews";
+export const REVIEW_HISTORY_QUERY_KEY = "review-history";
+
+export const ReviewMode = {
+  DUE: "due",
+  QUICK: "quick",
+  PRACTICE: "practice",
+} as const;
+
+export type SessionMode = (typeof ReviewMode)[keyof typeof ReviewMode];

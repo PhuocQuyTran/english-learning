@@ -1,5 +1,6 @@
-import { useRef, useState, useEffect } from "react";
-import { Pause, AudioLines } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AudioLines, Pause, VolumeX } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface AudioPlayerProps {
   src?: string;
@@ -7,26 +8,50 @@ interface AudioPlayerProps {
   className?: string;
 }
 
+if (typeof window !== "undefined" && "speechSynthesis" in window) {
+  window.speechSynthesis.getVoices();
+}
+
 export function AudioPlayer({ src, word, className }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const isTransitioningRef = useRef(false);
+
   const [playing, setPlaying] = useState(false);
   const [audioError, setAudioError] = useState(false);
+
   const audioSrc = src ? (src.startsWith("//") ? `https:${src}` : src) : "";
+  const hasNothingToPlay = !audioSrc && !word;
 
   useEffect(() => {
     setPlaying(false);
     setAudioError(!audioSrc);
-  }, [audioSrc]);
+  }, [audioSrc, word]);
 
-  const speakWithWebSpeech = () => {
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [audioSrc, word]);
+
+  const speakWithWebSpeech = useCallback(() => {
     if (!word || !("speechSynthesis" in window)) {
       setAudioError(true);
       return;
     }
+
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(word);
     utterance.lang = "en-US";
+
+    const voices = window.speechSynthesis.getVoices();
+    utterance.voice =
+      voices.find((voice) => voice.lang.toLowerCase().startsWith("en-us")) ||
+      voices.find((voice) => voice.lang.toLowerCase().startsWith("en")) ||
+      null;
 
     utterance.onstart = () => setPlaying(true);
     utterance.onend = () => setPlaying(false);
@@ -36,9 +61,11 @@ export function AudioPlayer({ src, word, className }: AudioPlayerProps) {
     };
 
     window.speechSynthesis.speak(utterance);
-  };
+  }, [word]);
 
   const toggle = async () => {
+    if (hasNothingToPlay || isTransitioningRef.current) return;
+
     if (audioError || !audioSrc) {
       if (playing) {
         window.speechSynthesis.cancel();
@@ -52,6 +79,7 @@ export function AudioPlayer({ src, word, className }: AudioPlayerProps) {
     const audio = audioRef.current;
     if (!audio) return;
 
+    isTransitioningRef.current = true;
     try {
       if (playing) {
         audio.pause();
@@ -65,8 +93,16 @@ export function AudioPlayer({ src, word, className }: AudioPlayerProps) {
       console.warn("File MP3 lỗi, chuyển sang giọng đọc trình duyệt:", error);
       setAudioError(true);
       speakWithWebSpeech();
+    } finally {
+      isTransitioningRef.current = false;
     }
   };
+
+  const label = hasNothingToPlay
+    ? "No audio available"
+    : playing
+      ? "Pause audio"
+      : "Play audio";
 
   return (
     <>
@@ -78,25 +114,37 @@ export function AudioPlayer({ src, word, className }: AudioPlayerProps) {
           onEnded={() => setPlaying(false)}
           onPause={() => setPlaying(false)}
           onPlay={() => setPlaying(true)}
-          onError={() => {
-            setAudioError(true);
-          }}
+          onError={() => setAudioError(true)}
         />
       )}
-
-      <button
+      <Button
         type="button"
-        onClick={toggle}
-        className={`inline-flex items-center gap-2 px-3 py-2 bg-muted rounded hover:bg-muted/80 transition-colors ${className || ""}`}
-        aria-label={playing ? "Pause audio" : "Play audio"}
-        title={audioError ? "Using the browser's alternate voice" : undefined}
+        disabled={hasNothingToPlay}
+        aria-pressed={playing}
+        onPointerDown={(event) => event.stopPropagation()}
+        onMouseDown={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.stopPropagation();
+          toggle();
+        }}
+        className={`inline-flex items-center gap-2 px-3 py-2 bg-muted rounded hover:bg-muted/80 text-tertiary transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className || ""}`}
+        aria-label={label}
+        title={
+          hasNothingToPlay
+            ? label
+            : audioError
+              ? "Using the browser's alternate voice"
+              : undefined
+        }
       >
-        {playing ? (
+        {hasNothingToPlay ? (
+          <VolumeX className="w-4 h-4" />
+        ) : playing ? (
           <Pause className="w-4 h-4" />
         ) : (
           <AudioLines className="w-4 h-4" />
         )}
-      </button>
+      </Button>
     </>
   );
 }

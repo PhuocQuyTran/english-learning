@@ -1,3 +1,10 @@
+import * as vocabularyApiModule from "./vocabularyApi";
+
+const vocabularyApi =
+  (vocabularyApiModule as any).vocabularyApi ??
+  (vocabularyApiModule as any).default ??
+  (vocabularyApiModule as any);
+
 export interface DictionaryPhonetic {
   text?: string;
   audio?: string;
@@ -61,7 +68,6 @@ export async function getDictionaryEntry(
   }
 
   const entriesUrl = `${BASE_ENTRIES_URL}/${encodeURIComponent(normalized)}`;
-  BASE_ENTRIES_URL;
   let response: Response;
   try {
     response = await fetch(entriesUrl);
@@ -81,24 +87,21 @@ export async function getDictionaryEntry(
     });
   }
 
-  // 2. Nếu API trả về lỗi (404 Not Found, 400 Bad Request, v.v.)
   if (!response.ok) {
     const errorBody = data as Partial<DictionaryApiError>;
     throw new DictionaryError(errorBody.message || "Dictionary lookup failed", {
       title: errorBody.title || "No Definition Found",
       resolution: errorBody.resolution,
-      status: response.status, // Trả về đúng status gốc (VD: 404)
+      status: response.status,
     });
   }
 
-  // 3. Kiểm tra định dạng dữ liệu thành công
   if (!Array.isArray(data)) {
     throw new DictionaryError("Unexpected dictionary response format", {
       status: 502,
     });
   }
 
-  // 4. Map dữ liệu chuẩn hóa
   return data.map((entry: any) => ({
     word: String(entry.word || normalized),
     phonetic: entry.phonetic || entry.phonetics?.[0]?.text || undefined,
@@ -126,4 +129,16 @@ export async function getDictionaryEntry(
       : [],
     sourceUrls: Array.isArray(entry.sourceUrls) ? entry.sourceUrls : [],
   })) as DictionaryEntry[];
+}
+
+export async function getDictionaryEntryByVocabularyId(
+  vocabularyId: string,
+): Promise<DictionaryEntry[]> {
+  const vocabulary = await vocabularyApi.getVocabularyById(vocabularyId);
+
+  if (!vocabulary?.word) {
+    throw new DictionaryError("Vocabulary word not found", { status: 404 });
+  }
+
+  return getDictionaryEntry(vocabulary.word);
 }

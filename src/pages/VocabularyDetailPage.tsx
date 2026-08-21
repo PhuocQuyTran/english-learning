@@ -36,7 +36,14 @@ export default function VocabularyDetailPage() {
 
   const word = displayVocab?.word ?? "";
 
-  const dictQuery = useDictionary(word);
+  const shouldFetchVocabularyById = Boolean(
+    id && !isDictionaryLookup && !isLoading && !isError,
+  );
+
+  const dictQuery = useDictionary(
+    word,
+    shouldFetchVocabularyById ? id : undefined,
+  );
 
   const [showDictionary, setShowDictionary] = useState(isDictionaryLookup);
 

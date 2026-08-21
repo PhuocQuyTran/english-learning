@@ -43,7 +43,7 @@ export function DictionarySearch() {
         )}
 
         {query.isError && !isNotFoundError && (
-          <div className="text-sm text-red-600">
+          <div className="text-sm text-tertiary">
             {error instanceof DictionaryError
               ? error.message
               : "Unable to load dictionary data."}

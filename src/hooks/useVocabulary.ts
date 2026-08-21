@@ -6,7 +6,10 @@ import type {
   UpdateVocabularyInput,
 } from "@/services/vocabularyApi";
 import toast from "react-hot-toast";
-import { getDictionaryEntry } from "@/services/dictionaryApi";
+import {
+  getDictionaryEntry,
+  getDictionaryEntryByVocabularyId,
+} from "@/services/dictionaryApi";
 export const VOCABULARY_QUERY_KEY = "vocabularies";
 
 export function useVocabularies(params: VocabularyListParams) {
@@ -79,13 +82,20 @@ export function useVocabulary(id?: string) {
   });
 }
 
-export function useDictionary(word: string) {
+export function useDictionary(word: string, vocabularyId?: string) {
   return useQuery({
-    queryKey: [DICTIONARY_QUERY_KEY, word],
+    queryKey: [DICTIONARY_QUERY_KEY, vocabularyId ?? "manual", word],
 
-    queryFn: () => getDictionaryEntry(word),
+    queryFn: async () => {
+      if (vocabularyId) {
+        const entries = await getDictionaryEntryByVocabularyId(vocabularyId);
+        return entries;
+      }
 
-    enabled: Boolean(word.trim()),
+      return getDictionaryEntry(word);
+    },
+
+    enabled: Boolean(vocabularyId || word.trim()),
 
     staleTime: 1000 * 60 * 30,
 

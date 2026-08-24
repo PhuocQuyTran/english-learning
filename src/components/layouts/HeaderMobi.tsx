@@ -52,10 +52,10 @@ export default function HeaderMobile() {
               <Link
                 key={item.href}
                 to={item.href}
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-tertiary transition-colors hover:bg-muted hover:text-foreground"
+                className=" items-center justify-items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-tertiary transition-colors hover:bg-muted hover:text-foreground"
               >
                 <Icon className="h-6 w-6" />
-                <span className="md:flex hidden">{item.label}</span>
+                <span className="sm:block hidden ">{item.label}</span>
               </Link>
             );
           })}

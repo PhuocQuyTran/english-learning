@@ -99,6 +99,8 @@ export function useDictionary(word: string, vocabularyId?: string) {
 
     staleTime: 1000 * 60 * 30,
 
-    retry: false,
+    // retry: false,
+    retry: 4,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 }

@@ -10,7 +10,7 @@ export interface HubStat {
 
 export function ReviewHubStats({ stats }: { stats: HubStat[] }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2">
       {stats.map((stat) => (
         <StatCard
           key={stat.title}

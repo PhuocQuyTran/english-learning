@@ -22,3 +22,19 @@ export const reviewEndpoints = {
   submit: "/reviews",
   history: "/reviews/history",
 } as const;
+
+export const shadowingEndpoints = {
+  list: "/shadowing/recordings",
+  getById: (id: string) => `/shadowing/recordings/${id}`,
+  create: "/shadowing/recordings",
+  remove: (id: string) => `/shadowing/recordings/${id}`,
+} as const;
+
+export const audioItemEndpoints = {
+  list: "/audio-items",
+  getById: (id: string) => `/audio-items/${id}`,
+  create: "/audio-items",
+  upload: (id: string) => `/audio-items/${id}/upload`,
+  transcript: (id: string) => `/audio-items/${id}/transcript`,
+  remove: (id: string) => `/audio-items/${id}`,
+} as const;

@@ -14,6 +14,11 @@ const RegisterPage = lazy(() => import("@/pages/RegisterPage"));
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const ReviewPage = lazy(() => import("@/pages/ReviewPage"));
 const ReviewHistoryPage = lazy(() => import("@/pages/ReviewHistoryPage"));
+const ListeningPage = lazy(() => import("@/pages/ListeningPage"));
+const ListeningUploadPage = lazy(
+  () => import("@/components/listening/ListeningUploadPage"),
+);
+const ListeningDetailPage = lazy(() => import("@/pages/ListeningDetailPage"));
 
 function PageLoader() {
   return (
@@ -92,9 +97,25 @@ const router = createBrowserRouter([
       {
         path: "listening",
         element: (
-          <div className="p-8 text-muted-foreground">
-            Listening — coming soon
-          </div>
+          <Suspense fallback={<PageLoader />}>
+            <ListeningPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "listening/upload",
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ListeningUploadPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "listening/:id",
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ListeningDetailPage />
+          </Suspense>
         ),
       },
       {

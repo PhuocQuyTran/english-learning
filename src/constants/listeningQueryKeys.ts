@@ -14,3 +14,4 @@ export const STATUS_LABEL: Record<UploadStatus, string> = {
   ready: "Ready",
   error: "Error",
 };
+export const TEXT_SIZE_FILE = "File is too large - max 50MB";

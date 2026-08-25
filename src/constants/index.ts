@@ -2,7 +2,7 @@ export const REFRESH_TOKEN = "rt";
 export const ACCESS_TOKEN = "at";
 export const DEFAULT_AVATAR = "/plan-portal/src/assets/vite.svg";
 export const LEVEL_VALUES = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
-
+export const LEVELS = ["All", "A1", "A2", "B1", "B2", "C1", "C2"] as const;
 export const LEVEL_OPTIONS = [
   { value: "", label: "All Levels" },
   ...LEVEL_VALUES.map((level) => ({ value: level, label: level })),
@@ -33,11 +33,5 @@ export const SHORTCUTS = [
 
 export const DUE_REVIEWS_QUERY_KEY = "due-reviews";
 export const REVIEW_HISTORY_QUERY_KEY = "review-history";
-
-export const ReviewMode = {
-  DUE: "due",
-  QUICK: "quick",
-  PRACTICE: "practice",
-} as const;
-
-export type SessionMode = (typeof ReviewMode)[keyof typeof ReviewMode];
+export const MAX_FILE_SIZE_BYTES = 300 * 1024 * 1024;
+export const DEFAULT_THUMBNAIL_URL = "";

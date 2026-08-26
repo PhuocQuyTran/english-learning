@@ -32,3 +32,18 @@ export interface AudioItem {
   url: string;
   thumbnailUrl?: string;
 }
+export interface TranscriptSegment {
+  id?: string;
+  startTime: number;
+  endTime: number;
+  text: string;
+  sequence: number;
+}
+export interface Recording {
+  id: string;
+  blob: Blob;
+  url: string;
+  durationMs: number;
+  score: number | null;
+  createdAt: Date;
+}

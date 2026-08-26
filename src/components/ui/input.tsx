@@ -7,14 +7,15 @@ export interface InputProps extends React.ComponentProps<"input"> {
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
-    const { error } = useFormField();
+  ({ className, type, error: propError, ...props }, ref) => {
+    const { error: formError } = useFormField();
+    const isError = propError || formError;
     return (
       <input
         type={type}
         className={cn(
           "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          error &&
+          isError &&
             "border-destructive text-destructive placeholder:text-destructive focus-visible:ring-destructive",
           className,
         )}

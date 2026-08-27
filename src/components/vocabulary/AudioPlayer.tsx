@@ -9,6 +9,7 @@ interface AudioPlayerProps {
   variant?: "minimal" | "full";
   onTimeUpdate?: (currentTime: number) => void;
   onDurationChange?: (duration: number) => void;
+  onPlayStateChange?: (playing: boolean) => void;
   audioRef?: React.RefObject<HTMLAudioElement | null>;
 }
 
@@ -29,16 +30,22 @@ export function AudioPlayer({
   variant = "minimal",
   onTimeUpdate,
   onDurationChange,
+  onPlayStateChange,
   audioRef: externalAudioRef,
 }: AudioPlayerProps) {
   const internalAudioRef = useRef<HTMLAudioElement>(null);
   const audioRef = externalAudioRef || internalAudioRef;
   const isTransitioningRef = useRef(false);
 
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlayingState] = useState(false);
   const [audioError, setAudioError] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+
+  const setPlaying = (isPlaying: boolean) => {
+    setPlayingState(isPlaying);
+    onPlayStateChange?.(isPlaying);
+  };
 
   const audioSrc = src ? (src.startsWith("//") ? `https:${src}` : src) : "";
   const hasNothingToPlay = !audioSrc && !word;

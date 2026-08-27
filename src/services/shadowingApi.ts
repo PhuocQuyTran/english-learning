@@ -17,9 +17,12 @@ export interface CreateRecordingInput {
   durationMs: number;
 }
 
-export async function listRecordings(): Promise<ShadowingRecording[]> {
+export async function listRecordings(
+  transcriptSegmentId?: string,
+): Promise<ShadowingRecording[]> {
   const { data } = await api.get<ApiResponse<ShadowingRecording[]>>(
     shadowingEndpoints.list,
+    { params: transcriptSegmentId ? { transcriptSegmentId } : undefined },
   );
   return data.data;
 }

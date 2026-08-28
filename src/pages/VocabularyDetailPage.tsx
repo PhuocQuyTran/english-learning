@@ -36,14 +36,10 @@ export default function VocabularyDetailPage() {
 
   const word = displayVocab?.word ?? "";
 
-  const shouldFetchVocabularyById = Boolean(
-    id && !isDictionaryLookup && !isLoading && !isError,
-  );
-
-  const dictQuery = useDictionary(
-    word,
-    shouldFetchVocabularyById ? id : undefined,
-  );
+  // Prevent looking up the UUID in the dictionary while the actual word is still loading
+  const queryWord = (!isDictionaryLookup && isLoading) ? "" : word;
+  
+  const dictQuery = useDictionary(queryWord);
 
   const [showDictionary, setShowDictionary] = useState(isDictionaryLookup);
 

@@ -7,6 +7,9 @@ export interface DashboardOverview {
   dueReviews: number;
   totalNotes: number;
   streak: number;
+  longestStreak: number;
+  isActiveToday: boolean;
+  recentActivity: { date: string; active: boolean }[];
   todayReviewed: number;
   dailyGoal: number;
 }

@@ -7,10 +7,13 @@ import type {
 } from "@/services/vocabularyApi";
 import toast from "react-hot-toast";
 import {
+  extractVocabularyFromTranscript,
   getDictionaryEntry,
-  getDictionaryEntryByVocabularyId,
+  DictionaryError,
 } from "@/services/dictionaryApi";
-export const VOCABULARY_QUERY_KEY = "vocabularies";
+import type { DictionaryEntry } from "@/services/dictionaryApi";
+import type { TranscriptSegment } from "@/types/listening";
+import { DICTIONARY_QUERY_KEY, VOCABULARY_QUERY_KEY } from "@/constants";
 
 export function useVocabularies(params: VocabularyListParams) {
   return useQuery({
@@ -71,8 +74,6 @@ export function useDeleteVocabulary() {
   });
 }
 
-export const DICTIONARY_QUERY_KEY = "dictionary";
-
 export function useVocabulary(id?: string) {
   return useQuery({
     queryKey: [VOCABULARY_QUERY_KEY, id],
@@ -82,25 +83,40 @@ export function useVocabulary(id?: string) {
   });
 }
 
-export function useDictionary(word: string, vocabularyId?: string) {
-  return useQuery({
-    queryKey: [DICTIONARY_QUERY_KEY, vocabularyId ?? "manual", word],
+export function useDictionary(word: string) {
+  return useQuery<DictionaryEntry[], DictionaryError>({
+    queryKey: [DICTIONARY_QUERY_KEY, word],
 
-    queryFn: async () => {
-      if (vocabularyId) {
-        const entries = await getDictionaryEntryByVocabularyId(vocabularyId);
-        return entries;
-      }
+    queryFn: () => getDictionaryEntry(word),
 
-      return getDictionaryEntry(word);
-    },
-
-    enabled: Boolean(vocabularyId || word.trim()),
+    enabled: Boolean(word.trim()),
 
     staleTime: 1000 * 60 * 30,
 
-    // retry: false,
-    retry: 4,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retry: (failureCount, error) => {
+      if (error instanceof DictionaryError && error.status === 404) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
+  });
+}
+
+
+export function useExtractVocabulary(
+  audioItemId: string,
+  segments: TranscriptSegment[],
+  level: string = "B1",
+  enabled: boolean = false,
+) {
+  const fullText = segments.map((s) => s.text).join(" ");
+
+  return useQuery({
+    queryKey: ["extract-vocabulary", audioItemId],
+    queryFn: () => extractVocabularyFromTranscript(fullText, level),
+    enabled: enabled && !!audioItemId && segments.length > 0,
+    staleTime: Infinity,
+    retry: 1,
   });
 }

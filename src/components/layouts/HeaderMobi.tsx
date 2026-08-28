@@ -11,6 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { DictionarySearch } from "../DictionarySearch";
+import { Button } from "../ui/button";
 
 const navItems = [
   {
@@ -82,17 +83,17 @@ export default function HeaderMobile() {
             </PopoverContent>
           </Popover>
 
-          <button
+          <Button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted md:hidden"
             aria-label="Open menu"
             onClick={() => {
               const event = new CustomEvent("toggle-menu");
               window.dispatchEvent(event);
             }}
+            variant="ghost"
           >
             <Menu className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
       </div>
     </header>

@@ -1,6 +1,6 @@
 import type { Vocabulary } from "@/services/vocabularyApi";
 import type { UseQueryResult } from "@tanstack/react-query";
-import type { DictionaryEntry } from "@/services/dictionaryApi";
+import type { DictionaryEntry, DictionaryError } from "@/services/dictionaryApi";
 import { AudioPlayer } from "./AudioPlayer";
 
 export default function VocabularyInfo({
@@ -9,7 +9,7 @@ export default function VocabularyInfo({
   hidden = false,
 }: {
   vocabulary: Vocabulary;
-  dictionary?: UseQueryResult<DictionaryEntry[], Error>;
+  dictionary?: UseQueryResult<DictionaryEntry[], DictionaryError>;
   hidden?: boolean;
 }) {
   if (hidden) {
@@ -41,7 +41,7 @@ export default function VocabularyInfo({
         </div>
 
         <div className="flex items-center gap-2">
-          {audioUrl && <AudioPlayer src={audioUrl} word={vocabulary.word} />}
+          <AudioPlayer src={audioUrl} word={vocabulary.word} />
         </div>
       </div>
 
@@ -57,7 +57,7 @@ export default function VocabularyInfo({
         </div>
       )}
 
-      {vocabulary.tags && vocabulary.tags.length > 0 && (
+      {/* {vocabulary.tags && vocabulary.tags.length > 0 && (
         <div className="mt-4">
           <div className="flex gap-2 flex-wrap">
             {vocabulary.tags.map((t, idx) => (
@@ -65,12 +65,12 @@ export default function VocabularyInfo({
                 key={`${t}-${idx}`}
                 className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded"
               >
-                {t}
+                {t} 
               </span>
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

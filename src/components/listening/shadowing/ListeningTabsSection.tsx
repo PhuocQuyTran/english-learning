@@ -37,6 +37,7 @@ const LISTENING_DETAIL_TABS_CONFIG = [
 ] as const;
 export interface ListeningTabsSectionProps {
   audioItemId: string;
+  level?: string;
   isTranscriptLoading: boolean;
   isProcessing: boolean;
   isFailed: boolean;
@@ -48,6 +49,7 @@ export interface ListeningTabsSectionProps {
 }
 export function ListeningTabsSection({
   audioItemId,
+  level,
   isTranscriptLoading,
   isProcessing,
   isFailed,
@@ -95,6 +97,8 @@ export function ListeningTabsSection({
           <TranscriptPanel
             segments={segments}
             activeIndex={activeSegmentIndex}
+            audioItemId={audioItemId}
+            level={level}
             onSelect={onSegmentSelect}
             onOpenShadowing={onOpenShadowing}
           />
@@ -113,7 +117,7 @@ export function ListeningTabsSection({
       </TabsContent>
 
       <TabsContent value={ListeningDetailTab.VOCABULARY} className="mt-4">
-        <VocabularyTab audioItemId={audioItemId} />
+        <VocabularyTab audioItemId={audioItemId} segments={segments} />
       </TabsContent>
     </Tabs>
   );

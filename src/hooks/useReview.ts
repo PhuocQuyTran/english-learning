@@ -4,6 +4,7 @@ import * as reviewApi from "@/services/reviewApi";
 import type {
   ReviewHistoryParams,
   SubmitReviewInput,
+  DueReviewsParams,
 } from "@/services/reviewApi";
 import type { PaginationParams } from "@/services/types";
 import { useEffect, useMemo, useState } from "react";
@@ -11,10 +12,14 @@ import { useDashboardOverview } from "@/hooks/useDashboardOverview";
 import { useVocabularies } from "@/hooks/useVocabulary";
 import { useReviewKeyboardShortcuts } from "@/hooks/useReviewKeyboardShortcuts";
 import type { ReviewRating, ReviewSchedule } from "@/services/reviewApi";
-import { DUE_REVIEWS_QUERY_KEY, REVIEW_HISTORY_QUERY_KEY } from "@/constants";
+import {
+  DUE_REVIEWS_QUERY_KEY,
+  REVIEW_HISTORY_QUERY_KEY,
+  VOCABULARY_QUERY_KEY,
+} from "@/constants";
 import type { QuickSize, SessionMode } from "@/constants/review";
 
-export function useDueReviews(params?: PaginationParams) {
+export function useDueReviews(params?: DueReviewsParams) {
   return useQuery({
     queryKey: [DUE_REVIEWS_QUERY_KEY, params],
     queryFn: () => reviewApi.getDueReviews(params),
@@ -29,6 +34,7 @@ export function useSubmitReview() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [DUE_REVIEWS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [REVIEW_HISTORY_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [VOCABULARY_QUERY_KEY] });
     },
     onError: () => {
       toast.error("Failed to submit review");
@@ -46,14 +52,26 @@ export function useReviewHistory(params?: ReviewHistoryParams) {
 export function useReviewSession() {
   const [mode, setMode] = useState<SessionMode>("due");
   const [quickSize, setQuickSize] = useState<QuickSize>(10);
+  const [filterLevel, setFilterLevel] = useState<string | undefined>(undefined);
+  const [filterTag, setFilterTag] = useState<string | undefined>(undefined);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
   const [showShortcuts, setShowShortcuts] = useState(false);
 
   const dashboardQuery = useDashboardOverview();
-  const dueQuery = useDueReviews({ page: 1, limit: 100 });
-  const vocabQuery = useVocabularies({ page: 1, limit: 100 });
+  const dueQuery = useDueReviews({
+    page: 1,
+    limit: 100,
+    level: filterLevel,
+    tag: filterTag,
+  });
+  const vocabQuery = useVocabularies({
+    page: 1,
+    limit: 100,
+    level: filterLevel,
+    tag: filterTag,
+  });
   const submitReview = useSubmitReview();
   const [isSubmittingLocal, setIsSubmittingLocal] = useState(false);
 
@@ -89,7 +107,7 @@ export function useReviewSession() {
   useEffect(() => {
     restartSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, quickSize]);
+  }, [mode, quickSize, filterLevel, filterTag]);
 
   const advance = () => {
     setReviewedCount((count) => count + 1);
@@ -164,6 +182,10 @@ export function useReviewSession() {
     setMode,
     quickSize,
     setQuickSize,
+    filterLevel,
+    setFilterLevel,
+    filterTag,
+    setFilterTag,
     isFlipped,
     toggleFlip,
     reviewedCount,

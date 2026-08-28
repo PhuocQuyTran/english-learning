@@ -1,5 +1,6 @@
 import { Languages, LogOut, EllipsisVertical, CircleUser } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { StreakWidget } from "./StreakWidget";
 import {
   Popover,
   PopoverTrigger,
@@ -119,6 +120,8 @@ export default function Header() {
               </div>
             </PopoverContent>
           </Popover>
+
+          <StreakWidget />
 
           <div className="hidden items-center gap-2 sm:flex">
             <span className="text-sm font-semibold">

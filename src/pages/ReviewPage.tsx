@@ -25,6 +25,10 @@ export default function ReviewPage() {
     setMode,
     quickSize,
     setQuickSize,
+    filterLevel,
+    setFilterLevel,
+    filterTag,
+    setFilterTag,
     isFlipped,
     toggleFlip,
     reviewedCount,
@@ -123,6 +127,10 @@ export default function ReviewPage() {
             onModeChange={setMode}
             quickSize={quickSize}
             onQuickSizeChange={setQuickSize}
+            filterLevel={filterLevel}
+            onFilterLevelChange={setFilterLevel}
+            filterTag={filterTag}
+            onFilterTagChange={setFilterTag}
             sessionEstimateLabel={sessionEstimateLabel}
             estimatedMinutes={estimatedMinutes}
             sessionDescription={sessionDescription}

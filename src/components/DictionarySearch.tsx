@@ -73,15 +73,18 @@ export function DictionarySearch() {
                             {entry.phonetic}
                           </div>
                         )}
+                        {entry.vietnameseTranslation && (
+                          <div className="text-muted-foreground">
+                            {entry.vietnameseTranslation}
+                          </div>
+                        )}
                       </div>
                     </Link>
                     <div>
-                      {entry.phonetics?.find((p) => p.audio) && (
-                        <AudioPlayer
-                          src={entry.phonetics.find((p) => p.audio)!.audio!}
-                          word={entry.word}
-                        />
-                      )}
+                      <AudioPlayer
+                        src={entry.phonetics?.find((p) => p.audio)?.audio}
+                        word={entry.word}
+                      />
                     </div>
                   </div>
 
@@ -93,7 +96,7 @@ export function DictionarySearch() {
                       const meaningKey = `${meaning.partOfSpeech}-${firstDefinition.slice(0, 15)}`;
                       return (
                         <div key={meaningKey} className="text-sm">
-                          <div className="font-medium">
+                          <div className="w-fit px-2 py-0.5 font-medium text-tertiary border border-muted-foreground rounded ">
                             {meaning.partOfSpeech}
                           </div>
                           <div>{firstDefinition}</div>

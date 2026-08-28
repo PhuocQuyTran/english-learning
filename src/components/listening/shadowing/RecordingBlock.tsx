@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 
 interface RecordBlockProps {
   segmentSequence: number;
+  expectedText?: string;
   recordings: Recording[];
   bestId: string | null;
   onRecorded: (r: Recording) => void;
@@ -17,13 +18,14 @@ interface RecordBlockProps {
 }
 
 export function RecordBlock({
+  expectedText,
   recordings,
   bestId,
   onRecorded,
   onDelete,
 }: RecordBlockProps) {
   const { status, error, elapsedMs, analyserNode, start, stop } =
-    useAudioRecorder({ onRecorded });
+    useAudioRecorder({ expectedText, onRecorded });
 
   const isRecording = status === "recording";
   const isRequesting = status === "requesting";

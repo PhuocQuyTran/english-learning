@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Plus, BellDot, Edit, Trash2 } from "lucide-react";
+import { Plus, BellDot, Edit, Trash2, LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { CommonTable, type Column } from "../ui/commonTable";
@@ -22,7 +22,8 @@ import type { Vocabulary as VocabularyType } from "@/services/vocabularyApi";
 
 export default function Vocabulary() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [filter, setFilter] = useState<VocabularyFilter>("all");
+  // Derive filter from URL so the active tab survives page reload
+  const filter = (searchParams.get("status") || "all") as VocabularyFilter;
   const [sortMode, setSortMode] = useState<SortMode>("recent");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingVocabulary, setEditingVocabulary] = useState<
@@ -46,16 +47,21 @@ export default function Vocabulary() {
       level,
       partOfSpeech,
       tag,
+      status: filter !== "all" ? filter : undefined,
       sort: sortMode === "alphabetical" ? "word" : "created_at",
       order: sortMode === "recent" ? ("desc" as const) : ("asc" as const),
     };
-  }, [page, limit, keyword, level, partOfSpeech, tag, sortMode]);
+  }, [page, limit, keyword, level, partOfSpeech, tag, filter, sortMode]);
 
   const { data, isLoading } = useVocabularies(queryParams);
 
   const handleFilterChange = (newFilter: VocabularyFilter) => {
-    setFilter(newFilter);
     setSearchParams((prev) => {
+      if (newFilter !== "all") {
+        prev.set("status", newFilter);
+      } else {
+        prev.delete("status");
+      }
       prev.set("page", "1");
       return prev;
     });
@@ -74,13 +80,13 @@ export default function Vocabulary() {
   };
 
   const handleResetFilters = () => {
-    setFilter("all");
     setSortMode("recent");
     setSearchParams((prev) => {
       prev.delete("keyword");
       prev.delete("level");
       prev.delete("partOfSpeech");
       prev.delete("tag");
+      prev.delete("status");
       prev.set("page", "1");
       return prev;
     });
@@ -151,14 +157,32 @@ export default function Vocabulary() {
       render: (tags: string[] | undefined) =>
         tags && tags.length > 0 ? (
           <div className="flex gap-1 flex-wrap">
-            {tags.map((t) => (
-              <span
-                key={t}
-                className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded"
-              >
-                {t}
-              </span>
-            ))}
+            {tags.map((t) => {
+              if (t.startsWith("listening:")) {
+                const id = t.split(":")[1];
+                return (
+                  <Link
+                    key={t}
+                    to={`/listening/${id}`}
+                    className="flex items-center gap-1 text-xs px-2 py-0.5 bg-tertiary text-accent rounded hover:bg-blue-200 transition-colors duration-300 inline-block"
+                  >
+                    <span className="flex items-center gap-1">
+                      {" "}
+                      <LinkIcon size={16} />
+                      listening
+                    </span>
+                  </Link>
+                );
+              }
+              return (
+                <span
+                  key={t}
+                  className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded inline-block"
+                >
+                  {t}
+                </span>
+              );
+            })}
           </div>
         ) : (
           "-"
@@ -194,7 +218,7 @@ export default function Vocabulary() {
 
   return (
     <div className="w-full min-w-72  mx-auto space-y-6">
-      <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between justify-start gap-4">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between justify-start gap-4">
         <FilterVocabulary
           activeFilter={filter}
           onFilterChange={handleFilterChange}

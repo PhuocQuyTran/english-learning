@@ -5,6 +5,7 @@ import { FILTERS, LEVEL_OPTIONS } from "@/constants";
 import { AppSelect } from "../ui/appSelect";
 import { Button } from "../ui/button";
 import { Input } from "../ui/inputs/Input";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 export type VocabularyFilter = "all" | "learning" | "review" | "mastered";
 export type SortMode = "recent" | "alphabetical";
 
@@ -42,26 +43,22 @@ export default function FilterVocabulary({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2 flex-wrap">
-        <div className="flex gap-1.5">
-          {FILTERS.map(({ value, label }) => {
-            const isActive = activeFilter === value;
-            return (
-              <Button
+        <Tabs
+          value={activeFilter}
+          onValueChange={(v) => onFilterChange(v as VocabularyFilter)}
+        >
+          <TabsList className="bg-[#161B22] border border-white/10 p-1 py-1.5 h-auto rounded-lg">
+            {FILTERS.map(({ value, label }) => (
+              <TabsTrigger
                 key={value}
-                type="button"
-                size="sm"
-                variant={isActive ? "default" : "secondary"}
-                onClick={() => onFilterChange(value)}
-                className={cn(
-                  "shrink-0 text-xs font-medium transition-colors",
-                  !isActive && "text-muted-foreground hover:text-foreground",
-                )}
+                value={value}
+                className="text-xs font-medium py-1 px-3 data-[state=active]:bg-[#21262D] dark:data-[state=active]:text-[#E6EDF3]"
               >
                 {label}
-              </Button>
-            );
-          })}
-        </div>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
         <div className="w-[260px]">
           <SearchSelect
             value={searchKeyword || ""}

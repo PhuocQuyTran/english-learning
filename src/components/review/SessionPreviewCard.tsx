@@ -1,15 +1,22 @@
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { AppSelect } from "@/components/ui/appSelect";
+import { Input } from "@/components/ui/inputs/Input";
 import type { QuickSize } from "@/constants/review";
 import type { SessionMode } from "@/constants/review";
 import { QUICK_SIZE_OPTIONS, REVIEW_MODE_OPTIONS } from "@/constants/review";
+import { LEVEL_OPTIONS } from "@/constants";
 
 interface SessionPreviewCardProps {
   mode: SessionMode;
   onModeChange: (mode: SessionMode) => void;
   quickSize: QuickSize;
   onQuickSizeChange: (size: QuickSize) => void;
+  filterLevel?: string;
+  onFilterLevelChange: (level: string | undefined) => void;
+  filterTag?: string;
+  onFilterTagChange: (tag: string | undefined) => void;
   sessionEstimateLabel: string;
   estimatedMinutes: number;
   sessionDescription: string;
@@ -23,6 +30,10 @@ export function SessionPreviewCard({
   onModeChange,
   quickSize,
   onQuickSizeChange,
+  filterLevel,
+  onFilterLevelChange,
+  filterTag,
+  onFilterTagChange,
   sessionEstimateLabel,
   estimatedMinutes,
   sessionDescription,
@@ -41,6 +52,27 @@ export function SessionPreviewCard({
           About {estimatedMinutes} minute{estimatedMinutes > 1 ? "s" : ""}
         </div>
         <p className="text-sm text-muted-foreground">{sessionDescription}</p>
+
+        {/* ── Filter by Level & Tag ─────────────────────────── */}
+        <div className="space-y-2">
+          <div className="text-sm text-muted-foreground">Filter cards</div>
+          <div className="flex gap-2">
+            <AppSelect
+              value={filterLevel}
+              onChange={(val) => onFilterLevelChange(val || undefined)}
+              options={LEVEL_OPTIONS}
+              placeholder="All Levels"
+              className="flex-1"
+            />
+            <Input
+              type="text"
+              value={filterTag ?? ""}
+              onChange={(e) => onFilterTagChange(e.target.value || undefined)}
+              placeholder="Tag (e.g. listening:...)"
+              className="flex-1"
+            />
+          </div>
+        </div>
 
         <div className="grid grid-cols-3 gap-2">
           {REVIEW_MODE_OPTIONS.map(({ value, label }) => (

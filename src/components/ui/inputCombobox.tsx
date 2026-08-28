@@ -20,7 +20,7 @@ export type ComboboxOption = {
   label: string;
   value: string;
 };
-
+ 
 type ComboboxProps = {
   options: ComboboxOption[];
   defaultOptions?: ComboboxOption[];
@@ -78,7 +78,7 @@ const InputCombobox = ({
           {...props}
         >
           <div className="flex-1 min-w-0 w-0 overflow-hidden">
-            <span className="truncate block w-full text-black text-left">
+            <span className="truncate block w-full text-left">
               {selected ? selected.label : placeholder}
             </span>
           </div>
@@ -97,10 +97,10 @@ const InputCombobox = ({
                 onChange?.("");
               }}
             >
-              <X className="shrink-0 text-black" />
+              <X className="shrink-0" />
             </span>
           ) : (
-            <ChevronDown className="text-black shrink-0" />
+            <ChevronDown className="text-muted-foreground shrink-0" />
           )}
         </Button>
       </PopoverTrigger>

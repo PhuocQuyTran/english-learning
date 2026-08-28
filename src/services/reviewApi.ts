@@ -50,8 +50,13 @@ export interface ReviewHistoryParams extends PaginationParams {
   vocabularyId?: string;
 }
 
+export interface DueReviewsParams extends PaginationParams {
+  level?: string;
+  tag?: string;
+}
+
 export async function getDueReviews(
-  params?: PaginationParams,
+  params?: DueReviewsParams,
 ): Promise<PaginatedApiResponse<ReviewSchedule>> {
   const { data } = await api.get<PaginatedApiResponse<ReviewSchedule>>(
     reviewEndpoints.due,

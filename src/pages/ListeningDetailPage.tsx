@@ -125,6 +125,7 @@ export default function ListeningDetailPage() {
 
             <ListeningTabsSection
               audioItemId={id!}
+              level={item?.level ?? undefined}
               isTranscriptLoading={isTranscriptLoading}
               isProcessing={isProcessing}
               isFailed={isFailed}

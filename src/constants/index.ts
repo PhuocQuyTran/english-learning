@@ -37,3 +37,5 @@ export const STORAGE_KEY = "listening_player_playback_rate";
 export const SHADOWING_RECORDINGS_QUERY_KEY = "shadowing-recordings";
 export const MAX_FILE_SIZE_BYTES = 300 * 1024 * 1024;
 export const DEFAULT_THUMBNAIL_URL = "";
+export const VOCABULARY_QUERY_KEY = "vocabularies";
+export const DICTIONARY_QUERY_KEY = "dictionary";

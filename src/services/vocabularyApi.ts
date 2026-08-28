@@ -39,6 +39,7 @@ export interface VocabularyListParams extends PaginationParams {
   tag?: string;
   sort?: string;
   order?: "asc" | "desc";
+  status?: "all" | "learning" | "review" | "mastered";
 }
 
 export async function listVocabularies(

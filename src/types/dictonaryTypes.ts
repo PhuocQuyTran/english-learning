@@ -1,3 +1,5 @@
+import type { ExtractedWord } from "@/services/dictionaryApi";
+
 export interface Phonetic {
   text?: string;
   audio?: string;
@@ -35,4 +37,10 @@ export interface DictionaryError {
   title: string;
   message: string;
   resolution?: string;
+}
+export interface ExtractedWordCardProps {
+  word: ExtractedWord;
+  isSaved: boolean;
+  isSaving: boolean;
+  onSave: () => void;
 }

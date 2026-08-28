@@ -11,7 +11,7 @@ export default function DictionarySection({
   query,
 }: {
   word: string;
-  query: UseQueryResult<DictionaryEntry[], Error>;
+  query: UseQueryResult<DictionaryEntry[], DictionaryError>;
 }) {
   const isLoading = query.isLoading;
   const error = query.error;
@@ -55,14 +55,17 @@ export default function DictionarySection({
                       {entry.phonetic}
                     </div>
                   )}
+                  {entry.vietnameseTranslation && (
+                    <div className="text-muted-foreground">
+                      {entry.vietnameseTranslation}
+                    </div>
+                  )}
                 </div>
                 <div>
-                  {entry.phonetics?.find((p) => p.audio) && (
-                    <AudioPlayer
-                      src={entry.phonetics.find((p) => p.audio)!.audio!}
-                      word={entry.word}
-                    />
-                  )}
+                  <AudioPlayer
+                    src={entry.phonetics?.find((p) => p.audio)?.audio}
+                    word={entry.word}
+                  />
                 </div>
               </div>
               {entry.meanings.map((m, mi) => (

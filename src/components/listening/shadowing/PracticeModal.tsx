@@ -92,6 +92,7 @@ export function PracticeModal({
 
             <RecordBlock
               segmentSequence={segment.sequence}
+              expectedText={segment.text}
               recordings={recordings}
               bestId={best?.id ?? null}
               onRecorded={handleRecorded}

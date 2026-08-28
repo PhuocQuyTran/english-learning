@@ -8,6 +8,8 @@ import { SegmentText } from "./SegmentText";
 interface TranscriptPanelProps {
   segments: TranscriptSegment[];
   activeIndex: number;
+  audioItemId: string;
+  level?: string;
   onSelect: (index: number) => void;
   onOpenShadowing?: (index: number) => void;
 }
@@ -15,6 +17,8 @@ interface TranscriptPanelProps {
 export function TranscriptPanel({
   segments,
   activeIndex,
+  audioItemId,
+  level,
   onSelect,
   onOpenShadowing,
 }: TranscriptPanelProps) {
@@ -42,7 +46,10 @@ export function TranscriptPanel({
               key={`${segment.sequence}-${segment.startTime}`}
               role="button"
               tabIndex={0}
-              onClick={() => onSelect(index)}
+              onClick={(e) => {
+                if ((e.nativeEvent as any).isWordClick) return;
+                onSelect(index);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") onSelect(index);
               }}
@@ -62,9 +69,15 @@ export function TranscriptPanel({
                   #{segment.sequence}
                 </span>
               </div>
+
               <div className="mb-3">
-                <SegmentText text={segment.text} />
+                <SegmentText
+                  text={segment.text}
+                  audioItemId={audioItemId}
+                  level={level}
+                />
               </div>
+
               <div
                 className="flex items-center justify-between gap-2 border-t border-white/5 pt-2"
                 onClick={(e) => e.stopPropagation()}

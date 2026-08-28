@@ -65,7 +65,7 @@ const router = createBrowserRouter([
       {
         path: "vocabulary",
         element: (
-          <div className="p-8 text-muted-foreground">
+          <div className="text-muted-foreground">
             <VocabularyPage />
           </div>
         ),

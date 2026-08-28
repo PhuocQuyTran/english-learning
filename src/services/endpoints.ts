@@ -15,6 +15,15 @@ export const vocabularyEndpoints = {
   create: "/vocabularies",
   update: (id: string) => `/vocabularies/${id}`,
   delete: (id: string) => `/vocabularies/${id}`,
+  extract: "/vocabularies/extract",
+} as const;
+
+export const notesEndpoints = {
+  list: "/notes",
+  getById: (id: string) => `/notes/${id}`,
+  create: "/notes",
+  update: (id: string) => `/notes/${id}`,
+  remove: (id: string) => `/notes/${id}`,
 } as const;
 
 export const reviewEndpoints = {

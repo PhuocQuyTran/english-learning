@@ -1,9 +1,5 @@
-import * as vocabularyApiModule from "./vocabularyApi";
-
-const vocabularyApi =
-  (vocabularyApiModule as any).vocabularyApi ??
-  (vocabularyApiModule as any).default ??
-  (vocabularyApiModule as any);
+import { api } from "@/api/axios";
+import { vocabularyEndpoints } from "@/services/endpoints";
 
 export interface DictionaryPhonetic {
   text?: string;
@@ -31,12 +27,22 @@ export interface DictionaryEntry {
   phonetics: DictionaryPhonetic[];
   meanings: DictionaryMeaning[];
   sourceUrls?: string[];
+  vietnameseTranslation?: string;
 }
 
 export interface DictionaryApiError {
   title: string;
   message: string;
   resolution?: string;
+}
+
+export interface ExtractedWord {
+  word: string;
+  phonetic: string;
+  partOfSpeech: string;
+  meaning: string;
+  example: string;
+  difficulty: "medium" | "hard";
 }
 
 export class DictionaryError extends Error {
@@ -56,7 +62,139 @@ export class DictionaryError extends Error {
   }
 }
 
-const BASE_ENTRIES_URL = "https://api.dictionaryapi.dev/api/v2/entries/en";
+const WIKTIONARY_URL = "https://en.wiktionary.org/api/rest_v1/page/definition";
+
+// ─── Wiktionary Parser ───────────────────────────────────────────────
+
+/** Strip lightweight HTML tags Wiktionary embeds in definition strings. */
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, "").trim();
+}
+
+/**
+ * Fetch a word definition from the Wiktionary REST v1 API and normalise the
+ * response into our shared `DictionaryEntry[]` shape.
+ *
+ * Wiktionary response shape (simplified):
+ * { en: [ { partOfSpeech, language, definitions: [{ definition, parsedExamples?, synonyms? }] } ] }
+ */
+export async function getWiktionaryEntry(
+  word: string,
+): Promise<DictionaryEntry[]> {
+  const normalized = (word || "").trim();
+  if (!normalized) {
+    throw new DictionaryError("Word is empty", { status: 400 });
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(
+      `${WIKTIONARY_URL}/${encodeURIComponent(normalized)}`,
+    );
+  } catch {
+    throw new DictionaryError("Network error while contacting Wiktionary", {
+      status: 0,
+    });
+  }
+
+  if (response.status === 404) {
+    throw new DictionaryError(`No Wiktionary entry found for "${normalized}"`, {
+      title: "No Definition Found",
+      status: 404,
+    });
+  }
+
+  if (!response.ok) {
+    throw new DictionaryError("Wiktionary lookup failed", {
+      status: response.status,
+    });
+  }
+
+  let data: Record<string, unknown[]>;
+  try {
+    data = await response.json();
+  } catch {
+    throw new DictionaryError("Unexpected Wiktionary response format", {
+      status: 502,
+    });
+  }
+
+  // Wiktionary sections keyed by language code, e.g. "en"
+  const englishSections = (data["en"] ?? []) as Array<{
+    partOfSpeech: string;
+    definitions: Array<{
+      definition: string;
+      parsedExamples?: Array<{ example: string }>;
+      synonyms?: string[];
+      antonyms?: string[];
+    }>;
+  }>;
+
+  if (englishSections.length === 0) {
+    throw new DictionaryError(
+      `No English definition found on Wiktionary for "${normalized}"`,
+      { title: "No Definition Found", status: 404 },
+    );
+  }
+
+  const meanings: DictionaryMeaning[] = englishSections.map((section) => ({
+    partOfSpeech: section.partOfSpeech || "unknown",
+    definitions: (section.definitions ?? []).map((def) => ({
+      definition: stripHtml(def.definition),
+      example: def.parsedExamples?.[0]
+        ? stripHtml(def.parsedExamples[0].example)
+        : undefined,
+      synonyms: def.synonyms ?? [],
+      antonyms: def.antonyms ?? [],
+    })),
+    synonyms: [],
+    antonyms: [],
+  }));
+
+  const entry: DictionaryEntry = {
+    word: normalized,
+    // Wiktionary REST v1 does not expose IPA phonetics in this endpoint
+    phonetic: undefined,
+    phonetics: [],
+    meanings,
+    sourceUrls: [
+      `https://en.wiktionary.org/wiki/${encodeURIComponent(normalized)}`,
+    ],
+  };
+
+  return [entry];
+}
+
+async function getVietnameseTranslation(
+  word: string,
+): Promise<string | undefined> {
+  try {
+    const res = await fetch(
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
+        word,
+      )}&langpair=en|vi`,
+    );
+    if (!res.ok) return undefined;
+    const data = await res.json();
+    return data?.responseData?.translatedText || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+
+
+export async function extractVocabularyFromTranscript(
+  transcriptText: string,
+  level: string = "B1",
+): Promise<ExtractedWord[]> {
+  const { data } = await api.post(vocabularyEndpoints.extract, {
+    transcriptText,
+    level,
+  });
+
+  return data.data;
+}
 
 export async function getDictionaryEntry(
   word: string,
@@ -67,78 +205,18 @@ export async function getDictionaryEntry(
     throw new DictionaryError("Word is empty", { status: 400 });
   }
 
-  const entriesUrl = `${BASE_ENTRIES_URL}/${encodeURIComponent(normalized)}`;
-  let response: Response;
-  try {
-    response = await fetch(entriesUrl);
-  } catch (error) {
-    throw new DictionaryError(
-      "Network error while contacting dictionary service",
-      { status: 0 },
-    );
-  }
+  // Fetch translation and wiktionary concurrently
+  const translationPromise = getVietnameseTranslation(normalized);
+  const wiktionaryPromise = getWiktionaryEntry(normalized);
 
-  let data: unknown;
-  try {
-    data = await response.json();
-  } catch {
-    throw new DictionaryError("Unexpected dictionary response format", {
-      status: 502,
-    });
-  }
+  const [translation, entries] = await Promise.all([
+    translationPromise,
+    wiktionaryPromise,
+  ]);
 
-  if (!response.ok) {
-    const errorBody = data as Partial<DictionaryApiError>;
-    throw new DictionaryError(errorBody.message || "Dictionary lookup failed", {
-      title: errorBody.title || "No Definition Found",
-      resolution: errorBody.resolution,
-      status: response.status,
-    });
-  }
-
-  if (!Array.isArray(data)) {
-    throw new DictionaryError("Unexpected dictionary response format", {
-      status: 502,
-    });
-  }
-
-  return data.map((entry: any) => ({
-    word: String(entry.word || normalized),
-    phonetic: entry.phonetic || entry.phonetics?.[0]?.text || undefined,
-    phonetics: Array.isArray(entry.phonetics)
-      ? entry.phonetics.map((phone: any) => ({
-          text: phone.text,
-          audio: phone.audio,
-          sourceUrl: phone.sourceUrl,
-        }))
-      : [],
-    meanings: Array.isArray(entry.meanings)
-      ? entry.meanings.map((meaning: any) => ({
-          partOfSpeech: meaning.partOfSpeech || "",
-          definitions: Array.isArray(meaning.definitions)
-            ? meaning.definitions.map((def: any) => ({
-                definition: def.definition || "",
-                example: def.example,
-                synonyms: Array.isArray(def.synonyms) ? def.synonyms : [],
-                antonyms: Array.isArray(def.antonyms) ? def.antonyms : [],
-              }))
-            : [],
-          synonyms: Array.isArray(meaning.synonyms) ? meaning.synonyms : [],
-          antonyms: Array.isArray(meaning.antonyms) ? meaning.antonyms : [],
-        }))
-      : [],
-    sourceUrls: Array.isArray(entry.sourceUrls) ? entry.sourceUrls : [],
-  })) as DictionaryEntry[];
+  return entries.map((entry) => ({
+    ...entry,
+    vietnameseTranslation: translation,
+  }));
 }
 
-export async function getDictionaryEntryByVocabularyId(
-  vocabularyId: string,
-): Promise<DictionaryEntry[]> {
-  const vocabulary = await vocabularyApi.getVocabularyById(vocabularyId);
-
-  if (!vocabulary?.word) {
-    throw new DictionaryError("Vocabulary word not found", { status: 404 });
-  }
-
-  return getDictionaryEntry(vocabulary.word);
-}
